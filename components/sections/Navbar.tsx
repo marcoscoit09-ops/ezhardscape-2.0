@@ -50,7 +50,9 @@ type DropdownId = "services" | "contact" | "call" | null;
 
 export default function Navbar({ dark = false }: { dark?: boolean }) {
   const { lang, toggle, t } = useLang();
-  const [open, setOpen] = useState<DropdownId>(null);
+  const [open,       setOpen]       = useState<DropdownId>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileServices, setMobileServices] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const openDrop  = useCallback((id: DropdownId) => {
@@ -88,7 +90,7 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
         }`}
       />
 
-      <nav className="relative flex items-center justify-between" style={{ padding: "14px 100px" }}>
+      <nav className="relative flex items-center justify-between px-5 md:px-[100px] py-3.5">
 
         {/* ── Logo ───────────────────────────────────────────── */}
         <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
@@ -101,8 +103,8 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
           </span>
         </Link>
 
-        {/* ── Nav items ──────────────────────────────────────── */}
-        <ul className="flex items-center gap-1">
+        {/* ── Nav items (desktop only) ───────────────────────── */}
+        <ul className="hidden md:flex items-center gap-1">
 
           {/* Inicio — link directo, sin dropdown */}
           <li>
@@ -194,8 +196,8 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
 
         </ul>
 
-        {/* ── Right CTAs ─────────────────────────────────────── */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        {/* ── Right CTAs (desktop only) ──────────────────────── */}
+        <div className="hidden md:flex items-center gap-2 flex-shrink-0">
           {/* Language Toggle */}
           <button
             onClick={toggle}
@@ -253,7 +255,195 @@ export default function Navbar({ dark = false }: { dark?: boolean }) {
             {t("nav.getQuote")}
           </Link>
         </div>
+
+        {/* ── Mobile: Quote + Hamburger ───────────────────────── */}
+        <div className="flex md:hidden items-center gap-3">
+          <Link
+            href="/quote"
+            className="flex items-center justify-center bg-white text-black rounded-full active:scale-[0.98] transition-all duration-200"
+            style={{ fontFamily: "var(--font-schibsted)", fontWeight: 600, fontSize: "13px", padding: "7px 16px" }}
+          >
+            {t("nav.getQuote")}
+          </Link>
+
+          <button
+            onClick={() => setMobileOpen((v) => !v)}
+            className="flex flex-col justify-center items-center w-9 h-9 gap-1.5"
+            aria-label="Toggle menu"
+          >
+            <span
+              className="block w-5 h-[1.5px] bg-white transition-all duration-300 origin-center"
+              style={{ transform: mobileOpen ? "rotate(45deg) translate(0px, 5px)" : "none" }}
+            />
+            <span
+              className="block w-5 h-[1.5px] bg-white transition-all duration-300"
+              style={{ opacity: mobileOpen ? 0 : 1, transform: mobileOpen ? "scaleX(0)" : "none" }}
+            />
+            <span
+              className="block w-5 h-[1.5px] bg-white transition-all duration-300 origin-center"
+              style={{ transform: mobileOpen ? "rotate(-45deg) translate(0px, -5px)" : "none" }}
+            />
+          </button>
+        </div>
       </nav>
+
+      {/* ── Mobile Menu ────────────────────────────────────────── */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            className="md:hidden absolute top-full left-0 right-0"
+            style={{
+              background:           "rgba(10,12,11,0.97)",
+              backdropFilter:       "blur(24px)",
+              WebkitBackdropFilter: "blur(24px)",
+              borderTop:            "1px solid rgba(255,255,255,0.07)",
+            }}
+          >
+            <div className="px-5 py-6 space-y-1">
+
+              {/* Home */}
+              <Link
+                href="/"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-between px-3 py-3.5 rounded-xl hover:bg-white/08 active:bg-white/10 transition-colors"
+                style={{ fontFamily: "var(--font-schibsted)", fontWeight: 500, fontSize: "16px", color: "rgba(255,255,255,0.85)" }}
+              >
+                {t("nav.home")}
+              </Link>
+
+              {/* Services — expandable */}
+              <div>
+                <button
+                  onClick={() => setMobileServices((v) => !v)}
+                  className="w-full flex items-center justify-between px-3 py-3.5 rounded-xl hover:bg-white/08 active:bg-white/10 transition-colors"
+                  style={{ fontFamily: "var(--font-schibsted)", fontWeight: 500, fontSize: "16px", color: "rgba(255,255,255,0.85)", background: "none", border: "none", cursor: "pointer" }}
+                >
+                  {t("nav.services")}
+                  <motion.span animate={{ rotate: mobileServices ? 180 : 0 }} transition={{ duration: 0.18 }}>
+                    <ChevronDown className="w-4 h-4 opacity-50" />
+                  </motion.span>
+                </button>
+
+                <AnimatePresence>
+                  {mobileServices && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pl-4 pb-2 space-y-0.5">
+                        {SERVICES.map((s) => (
+                          <Link
+                            key={s.labelKey}
+                            href={s.href}
+                            onClick={() => { setMobileOpen(false); setMobileServices(false); }}
+                            className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/08 transition-colors"
+                          >
+                            <div className="relative w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
+                              <Image src={s.img} alt="" fill className="object-cover" sizes="32px" />
+                            </div>
+                            <span style={{ fontFamily: "var(--font-schibsted)", fontSize: "14px", color: "rgba(255,255,255,0.75)" }}>
+                              {t(s.labelKey)}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* About */}
+              <Link
+                href="/about"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-between px-3 py-3.5 rounded-xl hover:bg-white/08 active:bg-white/10 transition-colors"
+                style={{ fontFamily: "var(--font-schibsted)", fontWeight: 500, fontSize: "16px", color: "rgba(255,255,255,0.85)" }}
+              >
+                {t("nav.about")}
+              </Link>
+
+              {/* Divider */}
+              <div className="h-px bg-white/10 my-2" />
+
+              {/* Contact links */}
+              <a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/08 transition-colors"
+              >
+                <div className="flex items-center justify-center rounded-xl w-8 h-8" style={{ backgroundColor: "#25D36625" }}>
+                  <WhatsAppIcon className="w-4 h-4" style={{ color: "#25D366" }} />
+                </div>
+                <span style={{ fontFamily: "var(--font-schibsted)", fontSize: "14px", color: "rgba(255,255,255,0.75)" }}>
+                  WhatsApp
+                </span>
+              </a>
+
+              <a
+                href={CALL_URL}
+                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/08 transition-colors"
+              >
+                <div className="flex items-center justify-center rounded-xl w-8 h-8" style={{ backgroundColor: "rgba(255,255,255,0.1)" }}>
+                  <Phone className="w-4 h-4 text-white/70" />
+                </div>
+                <span style={{ fontFamily: "var(--font-schibsted)", fontSize: "14px", color: "rgba(255,255,255,0.75)" }}>
+                  {t("nav.callDirect")}
+                </span>
+              </a>
+
+              <a
+                href={`mailto:${EMAIL_ADDRESS}`}
+                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/08 transition-colors"
+              >
+                <div className="flex items-center justify-center rounded-xl w-8 h-8" style={{ backgroundColor: "#f59e0b25" }}>
+                  <Mail className="w-4 h-4" style={{ color: "#f59e0b" }} />
+                </div>
+                <span style={{ fontFamily: "var(--font-schibsted)", fontSize: "14px", color: "rgba(255,255,255,0.75)" }}>
+                  {t("nav.email")}
+                </span>
+              </a>
+
+              {/* Divider */}
+              <div className="h-px bg-white/10 my-2" />
+
+              {/* Language toggle */}
+              <div className="flex items-center justify-between px-3 py-2">
+                <span style={{ fontFamily: "var(--font-schibsted)", fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>
+                  Language
+                </span>
+                <button
+                  onClick={toggle}
+                  style={{
+                    fontFamily:  "var(--font-schibsted)",
+                    fontWeight:  600,
+                    fontSize:    "13px",
+                    padding:     "6px 14px",
+                    borderRadius: "8px",
+                    border:      "1px solid rgba(255,255,255,0.18)",
+                    background:  "rgba(255,255,255,0.07)",
+                    cursor:      "pointer",
+                    letterSpacing: "0.4px",
+                    color:       "white",
+                  }}
+                >
+                  <span style={{ opacity: lang === "en" ? 1 : 0.4 }}>EN</span>
+                  <span style={{ opacity: 0.3, margin: "0 4px" }}>|</span>
+                  <span style={{ opacity: lang === "es" ? 1 : 0.4 }}>ES</span>
+                </button>
+              </div>
+
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
