@@ -90,6 +90,14 @@ export default function Preloader() {
         { yPercent: -100, duration: 1, ease: "power4.inOut" },
         "+=0.25",
       );
+
+      // Seguridad: si el componente se desmonta (p. ej. navegación) antes de
+      // que termine la secuencia, reactivamos el scroll igualmente para no
+      // dejar la página bloqueada.
+      return () => {
+        lenis?.start();
+        document.documentElement.classList.remove("is-loading");
+      };
     },
     { scope: rootRef, dependencies: [done] },
   );

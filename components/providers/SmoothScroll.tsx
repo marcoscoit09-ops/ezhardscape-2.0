@@ -12,13 +12,13 @@ if (typeof window !== "undefined") {
 /**
  * Smooth scroll (Lenis) integrado con GSAP ScrollTrigger.
  *
- * - `ReactLenis root` instala Lenis sobre <html> y expone el hook `useLenis()`
- *   a cualquier componente cliente descendiente.
- * - Desactivamos el RAF interno de Lenis (`autoRaf: false`) y lo conducimos
- *   desde el ticker de GSAP, de modo que Lenis y ScrollTrigger comparten el
- *   mismo reloj y nunca se desincronizan.
- * - En cada scroll de Lenis disparamos `ScrollTrigger.update()` para que las
- *   animaciones ligadas al scroll se mantengan perfectamente sincronizadas.
+ * `ReactLenis root` instala Lenis sobre <html> y gestiona su propio RAF
+ * (autoRaf por defecto), de modo que el scroll suave SIEMPRE funciona aunque
+ * el resto de la integración falle. Como Lenis en modo `root` hace scroll real
+ * del documento, ScrollTrigger ya reacciona a los eventos nativos; además lo
+ * empujamos en cada scroll de Lenis para que vaya perfectamente sincronizado.
+ *
+ * `useLenis()` queda disponible para cualquier componente cliente descendiente.
  */
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<LenisRef>(null);
@@ -28,16 +28,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     if (!lenis) return;
 
     lenis.on("scroll", ScrollTrigger.update);
-
-    function update(time: number) {
-      lenis!.raf(time * 1000); // GSAP ticker está en segundos; Lenis espera ms
-    }
-
-    gsap.ticker.add(update);
-    gsap.ticker.lagSmoothing(0);
-
     return () => {
-      gsap.ticker.remove(update);
       lenis.off("scroll", ScrollTrigger.update);
     };
   }, []);
@@ -47,7 +38,6 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       root
       ref={lenisRef}
       options={{
-        autoRaf: false,
         duration: 0.9,
         easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       }}
