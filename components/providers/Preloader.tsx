@@ -1,26 +1,23 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import { useLang } from "@/contexts/LanguageContext";
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(useGSAP);
-}
-
 const MESSAGE_KEYS = ["boot.msg1", "boot.msg2", "boot.msg3", "boot.msg4", "boot.msg5"];
+const DURATION = 2600; // ms que tarda la barra en llegar al 100 %
 
 /**
  * Secuencia de arranque tipo borealishpc.com adaptada a EZ HARDSCAPE.
  *
- * Una cortina a pantalla completa con contador 0→100 %, barra de progreso y
- * mensajes técnicos rotativos. Al terminar, la cortina se retira hacia arriba
- * revelando la página. Bloquea el scroll de Lenis mientras carga.
+ * Implementación deliberadamente autónoma (React + requestAnimationFrame, sin
+ * depender de GSAP): una cortina a pantalla completa con contador 0→100 %,
+ * barra de progreso y mensajes técnicos rotativos. Al terminar, la cortina se
+ * retira hacia arriba (transición CSS) y revela la página.
  *
- * Se muestra una vez por sesión (sessionStorage). Borra esa clave para volver
- * a verlo, o elimina la condición si lo quieres en cada carga.
+ * Bloquea el scroll mientras carga y SIEMPRE lo reactiva al terminar o al
+ * desmontarse, con un temporizador de seguridad que garantiza que nunca se
+ * quede colgada. Se muestra una vez por sesión (sessionStorage).
  */
 export default function Preloader() {
   const lenis = useLenis();
@@ -31,83 +28,73 @@ export default function Preloader() {
     if (typeof window === "undefined") return false;
     return sessionStorage.getItem("ez-booted") === "1";
   });
+  const [progress, setProgress] = useState(0);
+  const [leaving, setLeaving] = useState(false);
+  const [msgIndex, setMsgIndex] = useState(0);
 
-  const rootRef = useRef<HTMLDivElement>(null);
-  const counterRef = useRef<HTMLSpanElement>(null);
-  const barRef = useRef<HTMLDivElement>(null);
-  const msgRef = useRef<HTMLDivElement>(null);
+  const lenisRef = useRef(lenis);
+  lenisRef.current = lenis;
 
-  useGSAP(
-    () => {
-      if (done) return;
+  useEffect(() => {
+    if (done) return;
 
-      // Bloquea el scroll durante la carga.
-      lenis?.stop();
-      document.documentElement.classList.add("is-loading");
+    document.documentElement.classList.add("is-loading");
+    lenisRef.current?.stop();
 
-      const progress = { value: 0 };
-      const tl = gsap.timeline({
-        onComplete: () => {
-          lenis?.start();
-          document.documentElement.classList.remove("is-loading");
-          sessionStorage.setItem("ez-booted", "1");
-          setDone(true);
-        },
-      });
+    let rafId = 0;
+    let finished = false;
+    const start = performance.now();
 
-      // Contador + barra 0 → 100 %.
-      tl.to(progress, {
-        value: 100,
-        duration: 2.6,
-        ease: "power2.inOut",
-        onUpdate: () => {
-          const v = Math.round(progress.value);
-          if (counterRef.current) counterRef.current.textContent = String(v);
-          if (barRef.current) barRef.current.style.transform = `scaleX(${v / 100})`;
-        },
-      });
+    const unlock = () => {
+      document.documentElement.classList.remove("is-loading");
+      lenisRef.current?.start();
+    };
 
-      // Mensajes rotativos sincronizados con el progreso.
-      MESSAGE_KEYS.forEach((key, i) => {
-        tl.call(
-          () => {
-            if (!msgRef.current) return;
-            gsap.fromTo(
-              msgRef.current,
-              { opacity: 0, y: 8 },
-              { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" },
-            );
-            msgRef.current.textContent = t(key);
-          },
-          [],
-          (i / MESSAGE_KEYS.length) * 2.6,
-        );
-      });
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      cancelAnimationFrame(rafId);
+      setProgress(100);
+      setLeaving(true); // dispara la transición CSS de salida de la cortina
+      // Tras la transición (~900ms) desmontamos y reactivamos el scroll.
+      window.setTimeout(() => {
+        unlock();
+        sessionStorage.setItem("ez-booted", "1");
+        setDone(true);
+      }, 950);
+    };
 
-      // Retirada de la cortina.
-      tl.to(
-        rootRef.current,
-        { yPercent: -100, duration: 1, ease: "power4.inOut" },
-        "+=0.25",
-      );
+    const tick = (now: number) => {
+      const pct = Math.min(100, ((now - start) / DURATION) * 100);
+      setProgress(pct);
+      setMsgIndex(Math.min(MESSAGE_KEYS.length - 1, Math.floor((pct / 100) * MESSAGE_KEYS.length)));
+      if (pct >= 100) {
+        finish();
+        return;
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
 
-      // Seguridad: si el componente se desmonta (p. ej. navegación) antes de
-      // que termine la secuencia, reactivamos el scroll igualmente para no
-      // dejar la página bloqueada.
-      return () => {
-        lenis?.start();
-        document.documentElement.classList.remove("is-loading");
-      };
-    },
-    { scope: rootRef, dependencies: [done] },
-  );
+    // Red de seguridad: pase lo que pase, termina como muy tarde a los 6 s.
+    const safety = window.setTimeout(finish, 6000);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.clearTimeout(safety);
+      unlock();
+    };
+  }, [done]);
 
   if (done) return null;
 
   return (
     <div
-      ref={rootRef}
       className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#F5F0E8] text-black"
+      style={{
+        transform: leaving ? "translateY(-100%)" : "translateY(0)",
+        transition: "transform 0.9s cubic-bezier(0.76, 0, 0.24, 1)",
+      }}
     >
       <div className="flex flex-col items-center gap-8 px-6 w-full max-w-md">
         <span className="font-[family-name:var(--font-fustat)] text-3xl md:text-4xl font-extrabold tracking-tight">
@@ -117,21 +104,20 @@ export default function Preloader() {
         {/* Barra de progreso */}
         <div className="w-full h-px bg-black/15 overflow-hidden">
           <div
-            ref={barRef}
             className="h-full bg-black origin-left"
-            style={{ transform: "scaleX(0)" }}
+            style={{ transform: `scaleX(${progress / 100})` }}
           />
         </div>
 
         <div className="flex w-full items-baseline justify-between">
           <div
-            ref={msgRef}
-            className="text-sm text-black/60 font-[family-name:var(--font-inter)]"
+            key={msgIndex}
+            className="text-sm text-black/60 font-[family-name:var(--font-inter)] animate-[fadeIn_0.35s_ease]"
           >
-            {t(MESSAGE_KEYS[0])}
+            {t(MESSAGE_KEYS[msgIndex])}
           </div>
           <div className="font-[family-name:var(--font-fustat)] text-2xl font-bold tabular-nums">
-            <span ref={counterRef}>0</span>
+            {Math.round(progress)}
             <span className="text-black/40"> %</span>
           </div>
         </div>
