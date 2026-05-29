@@ -23,11 +23,11 @@ export default function Hero() {
           loop
           playsInline
           preload="metadata"
-          poster="/images/hero-bg.jpg"
+          poster={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/hero-bg.jpg`}
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="/videos/hero.webm" type="video/webm" />
-          <source src="/videos/hero.mp4" type="video/mp4" />
+          <source src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/videos/hero.webm`} type="video/webm" />
+          <source src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/videos/hero.mp4`} type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-black/40" />
       </div>
