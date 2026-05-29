@@ -5,6 +5,9 @@ import Link from "next/link";
 import { ArrowLeft, CheckCircle2, ChevronRight } from "lucide-react";
 import Navbar from "@/components/sections/Navbar";
 import { useLang } from "@/contexts/LanguageContext";
+import Reveal from "@/components/ui/Reveal";
+import RevealText from "@/components/ui/RevealText";
+import ParallaxImage from "@/components/ui/ParallaxImage";
 
 /* ─── Types ───────────────────────────────────────────────────── */
 
@@ -70,11 +73,10 @@ export default function ServicePage({
 
       {/* ── Hero Banner ────────────────────────────────────── */}
       <section className="relative w-full h-[55vh] sm:h-[65vh] md:h-[70vh] overflow-hidden">
-        <Image
+        <ParallaxImage
           src={heroImage}
           alt={displayTitle}
-          fill
-          className="object-cover object-center"
+          className="absolute inset-0"
           priority
           sizes="100vw"
         />
@@ -254,12 +256,13 @@ export default function ServicePage({
         {/* Material Variants */}
         {variants.length > 0 && (
           <section className="mb-16 md:mb-24">
-            <h2
+            <RevealText
+              as="h2"
               className="mb-2 text-[28px] sm:text-[34px] md:text-[40px]"
               style={{ fontFamily: "var(--font-fustat)", fontWeight: 800, letterSpacing: "-2px" }}
             >
               {t("sp.availableStyles")}
-            </h2>
+            </RevealText>
             <p
               className="mb-8 md:mb-10"
               style={{ fontFamily: "var(--font-schibsted)", fontSize: "15px", color: "#666" }}
@@ -267,7 +270,7 @@ export default function ServicePage({
               {t("sp.premiumMat")}
             </p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <Reveal stagger={0.08} className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {variants.map((v) => (
                 <div
                   key={v.name}
@@ -293,19 +296,20 @@ export default function ServicePage({
                   </div>
                 </div>
               ))}
-            </div>
+            </Reveal>
           </section>
         )}
 
         {/* Photo Gallery */}
         {gallery.length > 0 && (
           <section className="mb-16 md:mb-24">
-            <h2
+            <RevealText
+              as="h2"
               className="mb-2 text-[28px] sm:text-[34px] md:text-[40px]"
               style={{ fontFamily: "var(--font-fustat)", fontWeight: 800, letterSpacing: "-2px" }}
             >
               {t("sp.gallery")}
-            </h2>
+            </RevealText>
             <p
               className="mb-8 md:mb-10"
               style={{ fontFamily: "var(--font-schibsted)", fontSize: "15px", color: "#666" }}
@@ -314,7 +318,7 @@ export default function ServicePage({
             </p>
 
             {/* Mobile: simple 1-col, Tablet: 2-col, Desktop: 3-col bento */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 auto-rows-[200px] md:auto-rows-[240px]">
+            <Reveal stagger={0.06} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 auto-rows-[200px] md:auto-rows-[240px]">
               {gallery.map((img, i) => (
                 <div
                   key={i}
@@ -344,21 +348,23 @@ export default function ServicePage({
                   </div>
                 </div>
               ))}
-            </div>
+            </Reveal>
           </section>
         )}
 
         {/* Bottom CTA Banner */}
-        <section
+        <Reveal
+          as="section"
           className="rounded-2xl md:rounded-3xl p-8 sm:p-12 md:p-16 text-center"
           style={{ background: "linear-gradient(135deg, #0e1311 0%, #1e2d2a 100%)" }}
         >
-          <h2
+          <RevealText
+            as="h2"
             className="text-white mb-3 md:mb-4 text-[28px] sm:text-[36px] md:text-[48px]"
             style={{ fontFamily: "var(--font-fustat)", fontWeight: 800, letterSpacing: "-2px" }}
           >
             {t("sp.ctaTitle")}
-          </h2>
+          </RevealText>
           <p
             className="text-white/60 mb-6 md:mb-8 mx-auto text-[14px] sm:text-[16px] md:text-[17px]"
             style={{ fontFamily: "var(--font-schibsted)", maxWidth: "480px" }}
@@ -373,7 +379,7 @@ export default function ServicePage({
             {t("sp.ctaBtn")}
             <ChevronRight className="w-5 h-5" />
           </Link>
-        </section>
+        </Reveal>
       </main>
     </div>
   );

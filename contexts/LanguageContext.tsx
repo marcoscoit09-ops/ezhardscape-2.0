@@ -11,6 +11,14 @@ interface LanguageContextValue {
 }
 
 const translations: Record<string, Record<Lang, string>> = {
+  /* ── Preloader / boot sequence ── */
+  "boot.msg1": { en: "Preparing the ground…",        es: "Preparando el terreno…" },
+  "boot.msg2": { en: "Laying the base course…",      es: "Compactando la base…" },
+  "boot.msg3": { en: "Setting pavers & travertine…", es: "Colocando adoquines y travertino…" },
+  "boot.msg4": { en: "Rolling out premium turf…",    es: "Extendiendo el césped premium…" },
+  "boot.msg5": { en: "Firing up the BBQ…",           es: "Encendiendo el BBQ…" },
+  "boot.tagline": { en: "Premium Outdoor Living · Arizona", es: "Espacios Exteriores Premium · Arizona" },
+
   /* ── Navbar ── */
   "nav.home":            { en: "Home",             es: "Inicio" },
   "nav.homeTagline":     { en: "Back to main page", es: "Volver a la página principal" },

@@ -4,6 +4,7 @@ import "./globals.css";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import FloatingContact from "@/components/ui/FloatingContact";
 import SmoothScroll from "@/components/providers/SmoothScroll";
+import Preloader from "@/components/providers/Preloader";
 
 /* ─── Fonts ──────────────────────────────────────────────────── */
 
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       >
         <SmoothScroll>
           <LanguageProvider>
+            <Preloader />
             {children}
             <FloatingContact />
           </LanguageProvider>

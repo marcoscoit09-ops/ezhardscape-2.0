@@ -10,6 +10,7 @@ import {
   ChevronRight, CheckCircle2, ArrowLeft,
 } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
+import RevealText from "@/components/ui/RevealText";
 import { WhatsAppIcon, InstagramIcon, FacebookIcon } from "@/components/ui/SocialIcons";
 import React from "react";
 
@@ -198,12 +199,13 @@ function QuoteForm() {
         >
           <ArrowLeft className="w-4 h-4" /> {t("quote.back")}
         </Link>
-        <h1
+        <RevealText
+          as="h1"
           className="leading-none mb-4"
           style={{ fontFamily: "var(--font-fustat)", fontWeight: 800, fontSize: "64px", letterSpacing: "-3px" }}
         >
           {t("quote.h1")}
-        </h1>
+        </RevealText>
         <p style={{ fontFamily: "var(--font-schibsted)", fontSize: "18px", color: "#666", maxWidth: "480px" }}>
           {t("quote.sub")}
         </p>

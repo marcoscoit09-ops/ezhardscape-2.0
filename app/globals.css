@@ -31,6 +31,13 @@ a {
   text-decoration: none;
 }
 
+/* Bloquea el scroll mientras la secuencia de arranque está activa. */
+html.is-loading,
+html.is-loading body {
+  overflow: hidden;
+  height: 100vh;
+}
+
 ::selection {
   background-color: rgba(0, 0, 0, 0.1);
 }

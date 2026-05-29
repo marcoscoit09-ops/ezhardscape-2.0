@@ -5,6 +5,9 @@ import Link from "next/link";
 import Navbar from "@/components/sections/Navbar";
 import { CheckCircle2, Star, MapPin, Award, Clock, Users } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
+import Reveal from "@/components/ui/Reveal";
+import RevealText from "@/components/ui/RevealText";
+import ParallaxImage from "@/components/ui/ParallaxImage";
 
 const CITIES = ["Mesa", "Phoenix", "Scottsdale", "Tempe", "Chandler", "Gilbert"];
 
@@ -40,11 +43,10 @@ export default function AboutPage() {
 
       {/* ── Hero Banner ─────────────────────────────────────── */}
       <section className="relative w-full h-[60vh] overflow-hidden">
-        <Image
+        <ParallaxImage
           src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1600&h=900&fit=crop&q=90"
           alt="EZ Hardscape team at work"
-          fill
-          className="object-cover object-center"
+          className="absolute inset-0"
           priority
           sizes="100vw"
         />
@@ -107,23 +109,25 @@ export default function AboutPage() {
         {/* Story */}
         <section className="grid grid-cols-[1fr_480px] gap-16 mb-24 items-center">
           <div>
-            <h2
+            <RevealText
+              as="h2"
               className="mb-6"
               style={{ fontFamily: "var(--font-fustat)", fontWeight: 800, fontSize: "48px", letterSpacing: "-2.5px" }}
             >
               {t("about.story.h2")}
-            </h2>
-            <div
+            </RevealText>
+            <Reveal
+              stagger={0.15}
               className="space-y-5"
               style={{ fontFamily: "var(--font-schibsted)", fontSize: "17px", color: "#3a3a3a", lineHeight: 1.75 }}
             >
               <p>{t("about.story.p1")}</p>
               <p>{t("about.story.p2")}</p>
               <p>{t("about.story.p3")}</p>
-            </div>
+            </Reveal>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <Reveal stagger={0.12} className="grid grid-cols-2 gap-4">
             {[
               "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop&q=80",
               "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=300&fit=crop&q=80",
@@ -134,17 +138,18 @@ export default function AboutPage() {
                 <Image src={src} alt="Project" fill className="object-cover" sizes="220px" />
               </div>
             ))}
-          </div>
+          </Reveal>
         </section>
 
         {/* Values */}
         <section className="mb-24">
-          <h2
+          <RevealText
+            as="h2"
             className="mb-3"
             style={{ fontFamily: "var(--font-fustat)", fontWeight: 800, fontSize: "44px", letterSpacing: "-2px" }}
           >
             {t("about.values.h2")}
-          </h2>
+          </RevealText>
           <p
             className="mb-12"
             style={{ fontFamily: "var(--font-schibsted)", fontSize: "16px", color: "#666" }}
@@ -152,7 +157,7 @@ export default function AboutPage() {
             {t("about.values.sub")}
           </p>
 
-          <div className="grid grid-cols-3 gap-6">
+          <Reveal stagger={0.08} className="grid grid-cols-3 gap-6">
             {VALUES.map(({ titleKey, bodyKey }) => (
               <div
                 key={titleKey}
@@ -171,17 +176,18 @@ export default function AboutPage() {
                 </p>
               </div>
             ))}
-          </div>
+          </Reveal>
         </section>
 
         {/* Testimonials */}
         <section className="mb-24">
-          <h2
+          <RevealText
+            as="h2"
             className="mb-3"
             style={{ fontFamily: "var(--font-fustat)", fontWeight: 800, fontSize: "44px", letterSpacing: "-2px" }}
           >
             {t("about.test.h2")}
-          </h2>
+          </RevealText>
           <p
             className="mb-12"
             style={{ fontFamily: "var(--font-schibsted)", fontSize: "16px", color: "#666" }}
@@ -189,7 +195,7 @@ export default function AboutPage() {
             {t("about.test.sub")}
           </p>
 
-          <div className="grid grid-cols-2 gap-6">
+          <Reveal stagger={0.1} className="grid grid-cols-2 gap-6">
             {TESTIMONIALS.map(({ name, location, stars, textKey, serviceKey }) => (
               <div
                 key={name}
@@ -229,24 +235,25 @@ export default function AboutPage() {
                 </div>
               </div>
             ))}
-          </div>
+          </Reveal>
         </section>
 
         {/* Service areas */}
         <section className="mb-24">
-          <h2
+          <RevealText
+            as="h2"
             className="mb-3"
             style={{ fontFamily: "var(--font-fustat)", fontWeight: 800, fontSize: "44px", letterSpacing: "-2px" }}
           >
             {t("about.areas.h2")}
-          </h2>
+          </RevealText>
           <p
             className="mb-10"
             style={{ fontFamily: "var(--font-schibsted)", fontSize: "16px", color: "#666" }}
           >
             {t("about.areas.sub")}
           </p>
-          <div className="grid grid-cols-3 gap-4">
+          <Reveal stagger={0.06} className="grid grid-cols-3 gap-4">
             {CITIES.map((city) => (
               <div
                 key={city}
@@ -259,20 +266,22 @@ export default function AboutPage() {
                 </span>
               </div>
             ))}
-          </div>
+          </Reveal>
         </section>
 
         {/* CTA */}
-        <section
+        <Reveal
+          as="section"
           className="rounded-3xl p-16 text-center"
           style={{ background: "linear-gradient(135deg, #0e1311 0%, #1e2d2a 100%)" }}
         >
-          <h2
+          <RevealText
+            as="h2"
             className="text-white mb-4"
             style={{ fontFamily: "var(--font-fustat)", fontWeight: 800, fontSize: "48px", letterSpacing: "-2.5px" }}
           >
             {t("about.cta.h2")}
-          </h2>
+          </RevealText>
           <p
             className="text-white/60 mb-8 mx-auto"
             style={{ fontFamily: "var(--font-schibsted)", fontSize: "17px", maxWidth: "440px" }}
@@ -286,7 +295,7 @@ export default function AboutPage() {
           >
             {t("about.cta.btn")}
           </Link>
-        </section>
+        </Reveal>
       </main>
     </div>
   );

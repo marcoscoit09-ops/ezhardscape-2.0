@@ -5,6 +5,8 @@ import Navbar from "@/components/sections/Navbar";
 import { Mail, Phone, ArrowUpRight } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import { WhatsAppIcon, InstagramIcon, FacebookIcon } from "@/components/ui/SocialIcons";
+import Reveal from "@/components/ui/Reveal";
+import RevealText from "@/components/ui/RevealText";
 import React from "react";
 
 export default function ContactPage() {
@@ -100,7 +102,8 @@ export default function ContactPage() {
           {t("contact.badge")}
         </div>
 
-        <h1
+        <RevealText
+          as="h1"
           className="text-white mb-5 leading-none"
           style={{
             fontFamily: "var(--font-fustat)",
@@ -110,7 +113,7 @@ export default function ContactPage() {
           }}
         >
           {t("contact.h1")}
-        </h1>
+        </RevealText>
 
         <p
           className="text-white/55 max-w-[500px]"
@@ -122,7 +125,7 @@ export default function ContactPage() {
 
       {/* ── Contact Cards ───────────────────────────────────── */}
       <main className="px-[120px] pb-24 max-w-[1440px] mx-auto">
-        <div className="grid grid-cols-3 gap-5 mb-16">
+        <Reveal stagger={0.08} className="grid grid-cols-3 gap-5 mb-16">
           {CONTACTS.map((c) => {
             const Icon = c.icon;
             return (
@@ -208,19 +211,20 @@ export default function ContactPage() {
               </a>
             );
           })}
-        </div>
+        </Reveal>
 
         {/* Quote form CTA */}
-        <div
+        <Reveal
           className="rounded-3xl p-12 text-center"
           style={{ background: "linear-gradient(135deg, #0e1311 0%, #1e2d2a 100%)" }}
         >
-          <h2
+          <RevealText
+            as="h2"
             className="text-white mb-4"
             style={{ fontFamily: "var(--font-fustat)", fontWeight: 800, fontSize: "40px", letterSpacing: "-2px" }}
           >
             {t("contact.form.h2")}
-          </h2>
+          </RevealText>
           <p
             className="text-white/55 mb-8 mx-auto"
             style={{ fontFamily: "var(--font-schibsted)", fontSize: "16px", maxWidth: "420px" }}
@@ -235,7 +239,7 @@ export default function ContactPage() {
             {t("contact.form.btn")}
             <ArrowUpRight className="w-4 h-4" />
           </Link>
-        </div>
+        </Reveal>
       </main>
     </div>
   );
