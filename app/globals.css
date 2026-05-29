@@ -16,7 +16,10 @@
 html,
 body {
   max-width: 100vw;
-  overflow-x: hidden;
+  /* `clip` recorta el desbordamiento horizontal SIN crear un contenedor de
+     scroll. Usar `hidden` convierte overflow-y en `auto` y rompe el
+     position:sticky del ScrollExperience (las tarjetas no aparecen al scrollear). */
+  overflow-x: clip;
   background-color: var(--background);
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
