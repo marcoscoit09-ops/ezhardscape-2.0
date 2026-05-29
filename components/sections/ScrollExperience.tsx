@@ -510,19 +510,23 @@ export default function ScrollExperience() {
     const container = containerRef.current;
     if (!container) return;
 
+    let rafId: number;
+
     function update() {
-      if (!container) return;
-      const rect           = container.getBoundingClientRect();
-      const totalScrollable = container.offsetHeight - window.innerHeight;
-      if (totalScrollable <= 0) return;
-      const progress = Math.max(0, Math.min(1, -rect.top / totalScrollable));
-      scrollYProgress.set(progress);
-      setActiveSlide(Math.min(Math.floor(progress * TOTAL_SLIDES), TOTAL_SLIDES - 1));
+      if (container) {
+        const rect            = container.getBoundingClientRect();
+        const totalScrollable = container.offsetHeight - window.innerHeight;
+        if (totalScrollable > 0) {
+          const progress = Math.max(0, Math.min(1, -rect.top / totalScrollable));
+          scrollYProgress.set(progress);
+          setActiveSlide(Math.min(Math.floor(progress * TOTAL_SLIDES), TOTAL_SLIDES - 1));
+        }
+      }
+      rafId = requestAnimationFrame(update);
     }
 
-    window.addEventListener("scroll", update, { passive: true });
-    update();
-    return () => window.removeEventListener("scroll", update);
+    rafId = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(rafId);
   }, [scrollYProgress]);
 
   return (

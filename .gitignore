@@ -1,5 +1,6 @@
 node_modules
 .next
+out
 .DS_Store
 tsconfig.tsbuildinfo
 public/videos/hero_original.mp4
