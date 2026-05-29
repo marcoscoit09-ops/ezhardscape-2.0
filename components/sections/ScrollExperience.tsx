@@ -1,13 +1,12 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
   motion,
-  useScroll,
+  useMotionValue,
   useTransform,
-  useMotionValueEvent,
   type MotionValue,
 } from "framer-motion";
 import {
@@ -503,16 +502,28 @@ function EstimatesSlide() {
 
 /* ─── Main ───────────────────────────────────────────────────────── */
 export default function ScrollExperience() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
-  });
+  const containerRef     = useRef<HTMLDivElement>(null);
+  const scrollYProgress  = useMotionValue(0);
   const [activeSlide, setActiveSlide] = useState(0);
 
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    setActiveSlide(Math.min(Math.floor(v * TOTAL_SLIDES), TOTAL_SLIDES - 1));
-  });
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    function update() {
+      if (!container) return;
+      const rect           = container.getBoundingClientRect();
+      const totalScrollable = container.offsetHeight - window.innerHeight;
+      if (totalScrollable <= 0) return;
+      const progress = Math.max(0, Math.min(1, -rect.top / totalScrollable));
+      scrollYProgress.set(progress);
+      setActiveSlide(Math.min(Math.floor(progress * TOTAL_SLIDES), TOTAL_SLIDES - 1));
+    }
+
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+    return () => window.removeEventListener("scroll", update);
+  }, [scrollYProgress]);
 
   return (
     <div ref={containerRef} style={{ height: `${TOTAL_SLIDES * 100}vh` }}>
