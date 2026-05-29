@@ -3,6 +3,7 @@ import { Schibsted_Grotesk, Inter, Noto_Sans, Fustat } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import FloatingContact from "@/components/ui/FloatingContact";
+import SmoothScroll from "@/components/providers/SmoothScroll";
 
 /* ─── Fonts ──────────────────────────────────────────────────── */
 
@@ -45,7 +46,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en">
       <body
         className={`
           ${schibstedGrotesk.variable} ${inter.variable}
@@ -53,10 +54,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           antialiased bg-[#F5F0E8] text-black
         `}
       >
-        <LanguageProvider>
-          {children}
-          <FloatingContact />
-        </LanguageProvider>
+        <SmoothScroll>
+          <LanguageProvider>
+            {children}
+            <FloatingContact />
+          </LanguageProvider>
+        </SmoothScroll>
       </body>
     </html>
   );

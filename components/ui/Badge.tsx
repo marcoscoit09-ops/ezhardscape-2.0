@@ -34,7 +34,7 @@ export default function Badge({
 
       {/* Light right side */}
       <div className="flex items-center bg-white px-3 py-1.5">
-        <span className="font-inter text-[13px] font-normal text-black/80 leading-none">
+        <span className="font-inter text-[11px] sm:text-[13px] font-normal text-black/80 leading-none">
           {text}
         </span>
       </div>
