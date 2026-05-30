@@ -48,6 +48,20 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
+      <head>
+        {/*
+          Auto-recuperación de caché: si el navegador tiene un HTML antiguo en
+          caché que apunta a chunks de JS que ya no existen (tras un nuevo
+          deploy), esos scripts dan 404 y la página se quedaría congelada. Este
+          script detecta ese fallo y recarga una sola vez con un parámetro que
+          fuerza obtener el HTML fresco del servidor.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){window.addEventListener('error',function(e){var t=e.target;if(t&&(t.tagName==='SCRIPT'||t.tagName==='LINK')){var u=t.src||t.href||'';if(/_next\\/static/.test(u)&&!sessionStorage.getItem('__cb')){sessionStorage.setItem('__cb','1');var n=new URL(location.href);n.searchParams.set('cb',Date.now());location.replace(n.toString());}}},true);})();`,
+          }}
+        />
+      </head>
       <body
         className={`
           ${schibstedGrotesk.variable} ${inter.variable}
